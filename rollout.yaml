@@ -17,7 +17,7 @@ spec:
       - name: meuapp-container
         image: hashicorp/http-echo:0.2.3
         args:
-          - "-text=version:v2"
+          - "-text=version:v3"
         ports:
           - containerPort: 5678
   strategy:
