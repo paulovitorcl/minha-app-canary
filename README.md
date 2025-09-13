@@ -1,11 +1,42 @@
-# minha-app-canary
+# Canary Deployment Approaches
 
-Important note: When using header-based routing like X-Canary-Version: canary, the weight-based traffic
-splitting works in addition to header routing:
+This repository contains different approaches for implementing canary deployments with Argo Rollouts.
 
-- Requests with the canary header → Always go to canary (regardless of weight)
-- Requests without the header → Follow the weight distribution between stable/canary
+## Directory Structure
 
-This gives you dual control:
-1. Deterministic access via headers for testing
-2. Gradual traffic shift via weights for real user traffic
+### `ingress-nginx/`
+Nginx Ingress Controller approach with header-based routing
+- Uses `nginx.ingress.kubernetes.io` annotations
+- Supports `X-Canary-Version: canary` header routing
+- Requires Nginx Ingress Controller
+
+### `openshift-routes/`
+OpenShift Route approaches (no service mesh required)
+
+#### `basic-weighted/`
+Basic percentage-based traffic splitting
+- Uses OpenShift Route `alternateBackends`
+- No header-based routing
+- Simple and reliable
+
+#### `header-annotations/`
+Attempts header-based routing with HAProxy annotations
+- May not work on all clusters (security restrictions)
+- Uses custom HAProxy config snippets
+- Test before production use
+
+#### `path-based/`
+Path-based routing approach
+- `/` → stable version
+- `/canary` → canary version
+- Always works with standard Route features
+
+#### `subdomain-based/`
+Subdomain-based routing approach
+- `app.domain.com` → stable version
+- `canary.app.domain.com` → canary version
+- Always works with standard Route features
+
+## Usage
+
+Choose the approach that fits your environment and requirements. All approaches work with Argo Rollouts for managing deployments.

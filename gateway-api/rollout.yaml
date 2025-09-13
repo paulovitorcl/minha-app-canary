@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: meuapp
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: meuapp
+  template:
+    metadata:
+      labels:
+        app: meuapp
+    spec:
+      containers:
+      - name: meuapp-container
+        image: hashicorp/http-echo:0.2.3
+        args:
+          - "-text=version:v5"
+        ports:
+          - containerPort: 5678
+  strategy:
+    canary:
+      canaryService: meuapp-canary
+      stableService: meuapp-stable
+      trafficRouting:
+        plugins:
+          argoproj-labs/gatewayAPI:
+            httpRoute: meuapp-route
+            namespace: default
+      steps:
+        - setWeight: 25
+        - pause: {duration: 60s}
+        - setWeight: 50
+        - pause: {duration: 60s}
+        - setWeight: 100

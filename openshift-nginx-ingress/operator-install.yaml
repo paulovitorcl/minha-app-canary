@@ -1,0 +1,16 @@
+# Install NGINX Ingress Operator from OperatorHub
+# Then create NGINX Ingress Controller instance
+
+apiVersion: k8s.nginx.org/v1
+kind: NginxIngress
+metadata:
+  name: nginx-ingress
+  namespace: nginx-ingress
+spec:
+  type: deployment
+  replicas: 2
+  image:
+    repository: nginx/nginx-ingress
+    tag: "3.4.3"
+  serviceType: LoadBalancer
+  nginxplus: false

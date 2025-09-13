@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: meuapp-canary-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-by-header: "X-Canary-Version"
+    nginx.ingress.kubernetes.io/canary-by-header-value: "canary"
+    nginx.ingress.kubernetes.io/canary-weight: "0"
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  rules:
+  - host: meuapp.apps.cluster.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: meuapp-canary
+            port:
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: meuapp-stable-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  rules:
+  - host: meuapp.apps.cluster.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: meuapp-stable
+            port:
+              number: 80
