@@ -24,9 +24,16 @@ spec:
     canary:
       canaryService: meuapp-canary
       stableService: meuapp-stable
+      trafficRouting:
+        nginx:
+          stableIngress: meuapp-stable-ingress
+          annotationPrefix: nginx.ingress.kubernetes.io
+          additionalIngressAnnotations:
+            canary-by-header: X-Canary-Version
+            canary-by-header-value: canary
       steps:
         - setWeight: 25
-        - pause: {duration: 10s}
+        - pause: {duration: 60s}
         - setWeight: 50
-        - pause: {duration: 10s}
+        - pause: {duration: 60s}
         - setWeight: 100
